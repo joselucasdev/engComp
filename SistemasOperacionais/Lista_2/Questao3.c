@@ -16,33 +16,34 @@ ser enviados em uma pasta compactada.
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <windows.h>
 
 /*Estrutura do processo*/
 struct processos {
     char id; //identifica processo
-    int duracao; //tempo de duraÃ§Ã£o do processo
+    int duracao; //tempo de duração do processo
     int ordem; //Prioridade do processo
     struct processos* prox;
 };
 
 typedef struct processos Processos; //
 
-//FunÃ§Ã£o de criaÃ§Ã£o: retorna processo vazio
+//Funçãp de criação: retorna processo vazio
 Processos* proc_cria(void){
     return NULL;
 }
 
-/*FunÃ§Ã£o para liberar o processo*/
+/*Função para liberar o processo*/
 void proc_libera(Processos* proc){
     Processos* p = proc; //auxiliar para percorrer a lista de procesos
-    //while(p != NULL){
-      //  Processos* tmp = p->prox;
+    while(p != NULL){
+        Processos* tmp = p->prox;
         free(p);
-        //p = tmp;
-    //}
+        p = tmp;
+    }
 }
 
-/*FunÃ§Ã£o para imprimir os processo da lista*/
+/*Função para imprimir os processo da lista*/
 void proc_imprime(Processos* proc){
     Processos* tmp;
     printf("Ordem dos processos por prioridade:\n");
@@ -58,7 +59,7 @@ Processos* proc_insere(Processos* proc, int id, int duracao, int ordem){
     Processos* aux = proc;  //aux para percorrer os processos
 
     //Procura a ordem certa de chegada
-    while(aux != NULL && aux->ordem < ordem){ //Enquanto nÃ£o achar avanÃ§a na lista de processos
+    while(aux != NULL && aux->ordem < ordem){ //Enquanto não achar avança na lista de processos
         ant = aux;
         aux = aux->prox;
     }
@@ -67,7 +68,7 @@ Processos* proc_insere(Processos* proc, int id, int duracao, int ordem){
     Processos* novo = (Processos*) malloc(sizeof(Processos));
 
     if (novo == NULL){
-        printf("Erro ao alocar memÃ³ria.\n");
+        printf("Erro ao alocar memória.\n");
         exit(1);
     }
     novo->id = id; //Atribui os valores
@@ -85,7 +86,7 @@ Processos* proc_insere(Processos* proc, int id, int duracao, int ordem){
     return proc;
 };
 
-/*Insere um processo numa lista de maneira ordenada pelo tempo(mesma lÃ³gica da funÃ§Ã£o acima)*/
+/*Insere um processo numa lista de maneira ordenada pelo tempo(mesma lógica da função acima)*/
 Processos* insere_menor_tempo(Processos *proc, int id, int duracao, int ordem){
     Processos* ant = NULL;
     Processos* aux = proc;
@@ -95,7 +96,7 @@ Processos* insere_menor_tempo(Processos *proc, int id, int duracao, int ordem){
         aux = aux->prox;
     }
     Processos* novo = (Processos*) malloc(sizeof(Processos));
-    if (novo == NULL){printf("Erro ao alocar memÃ³ria.\n"); exit(1);}
+    if (novo == NULL){printf("Erro ao alocar memória.\n"); exit(1);}
     novo->id = id;
     novo->duracao = duracao;
     novo->ordem = ordem;
@@ -112,7 +113,7 @@ Processos* insere_menor_tempo(Processos *proc, int id, int duracao, int ordem){
 }
 
 
-/*FunÃ§Ã£o para transformar uma lista em lista circular*/
+/*Função para transformar uma lista em lista circular*/
 Processos* insere_circular(Processos* proc){
     Processos *ini = proc;
     Processos *atual = proc;
@@ -124,18 +125,6 @@ Processos* insere_circular(Processos* proc){
     return ini;
 }
 
-/* Funï¿½ï¿½o para calcular a quantidade de processos na fila*/
-int proc_count(Processos* proc){
-	Processos *atual = proc;
-	int i = 1;
-	while(atual->prox != NULL){
-		i++;
-        atual = atual->prox;
-    }
-    proc_libera(atual);
-    return i;
-}
-
 //desfaz circular
 void proc_libera_circular(Processos* proc){
 	if (proc == NULL)
@@ -144,12 +133,12 @@ void proc_libera_circular(Processos* proc){
     // Inicia temp apontando para head
     Processos *temp = proc;
 
-    // Faz temp pular elementos da lista atï¿½ que aponte para
+    // Faz temp pular elementos da lista at? que aponte para
     // o elemento anterior a head
     while (temp->prox != proc)
         temp = temp->prox;
 
-    // Desaloca tudo enquanto temp nï¿½o aponta para head
+    // Desaloca tudo enquanto temp n?o aponta para head
     while (temp != proc && proc->prox != temp)
     {
         temp->prox = proc->prox;
@@ -157,7 +146,7 @@ void proc_libera_circular(Processos* proc){
         proc = temp->prox; 
     }
     // Saiu do loop, temp finalmente aponta para head
-    // Agora sï¿½ precisa desalocar o ï¿½ltimo elemento
+    // Agora s? precisa desalocar o ?ltimo elemento
     
 	proc->prox = NULL; 
     free(temp);
@@ -169,7 +158,7 @@ void proc_fifo(Processos* proc, int qtd){
 	printf("\nINICIO FIFO\n\n");
     int t_med = 0, soma = 0;    
     for(tmp = proc; tmp != NULL; tmp=tmp->prox){ //Percorre a lista de processos
-        printf("Processo %c executando...(%ds)\n", tmp->id, tmp->duracao);//Printa qual processo estÃ¡ no "escalonador"
+        printf("Processo %c executando...(%ds)\n", tmp->id, tmp->duracao);//Printa qual processo está no "escalonador"
         //Sleep((tmp->duracao)*1000); //Temporizador
         if(tmp->prox != NULL){
         	soma += tmp->duracao;
@@ -177,12 +166,12 @@ void proc_fifo(Processos* proc, int qtd){
 		}
     }
     proc_libera(tmp); //Libera a memoria com a lista de processos ordenados por tempo
-    printf("\nFIM FIFO\n\nTempo mï¿½dio: %0.2f u.t\n",(float) t_med/qtd);
+    printf("\nFIM FIFO\n\nTempo m?dio: %0.2f u.t\n",(float) t_med/qtd);
 }
 
- /*FunÃ§Ã£o que simula o SJF*/
+ /*Função que simula o SJF*/
 void sfj(Processos* proc){
-    Processos *aux=proc; //VariÃ¡vel aux que recebe o ponteiro para lista de processos
+    Processos *aux=proc; //Variável aux que recebe o ponteiro para lista de processos
     Processos *menor_job, *tmp;
     menor_job = proc_cria(); //Cria uma lista de processos vazia
 
@@ -194,7 +183,7 @@ void sfj(Processos* proc){
     printf("INICIO SJF\n\n");
     int t_med = 0, soma = 0;    
     for(tmp = menor_job; tmp != NULL; tmp=tmp->prox){ //Percorre a lista de processos
-        printf("Processo %c executando...(%ds)\n", tmp->id, tmp->duracao);//Printa qual processo estÃ¡ no "escalonador"
+        printf("Processo %c executando...(%ds)\n", tmp->id, tmp->duracao);//Printa qual processo está no "escalonador"
         //Sleep((tmp->duracao)*1000); //Temporizador
         if(tmp->prox != NULL){
         	soma += tmp->duracao;
@@ -202,19 +191,19 @@ void sfj(Processos* proc){
 		}
     }
     proc_libera(menor_job); //Libera a memoria com a lista de processos ordenados por tempo
-    printf("\nFIM SJF\n\nTempo mï¿½dio: %0.2f u.t\n",(float) t_med/5);
+    printf("\nFIM SJF\n\nTempo m?dio: %0.2f u.t\n",(float) t_med/5);
 }
 
-/*FunÃ§Ã£o que simula o Round Robin*/
+/*Função que simula o Round Robin*/
 void round_robin(Processos* proc, int quantum, int qtd){
-    Processos *aux = insere_circular(proc); //Cria uma lista de processo auxiliar que Ã© circular
+    Processos *aux = insere_circular(proc); //Cria uma lista de processo auxiliar que é circular
     int contem_proc;
     int stop = 0;
     int soma = 0; 
 
     while(aux != NULL && stop == 0){ //Percorre a lista circular de processo: Fica em Loop. :(
-        if(aux->duracao <= quantum && aux->duracao != 0){ //Verifica se o processo Ã© menor que o quantum e o processo ainda precisa ser executado(!=0)
-            printf("id: %c executando...(%ds)\n",aux->id,aux->duracao); //Mostra que estÃ¡ executando um determinado processo
+        if(aux->duracao <= quantum && aux->duracao != 0){ //Verifica se o processo é menor que o quantum e o processo ainda precisa ser executado(!=0)
+            printf("id: %c executando...(%ds)\n",aux->id,aux->duracao); //Mostra que está executando um determinado processo
             //Sleep((aux->duracao)*1000); //Simula o time-slice
             Processos *prox = aux->prox;
             int i = 0;
@@ -224,10 +213,10 @@ void round_robin(Processos* proc, int quantum, int qtd){
 				}
 				prox = prox->prox;
 			}
-            aux->duracao = 0; //Como o quantum Ã© maior, executa o tempo do processo e atribui a ele 0 para nÃ£o ser executado novamente
+            aux->duracao = 0; //Como o quantum é maior, executa o tempo do processo e atribui a ele 0 para não ser executado novamente
             
-        }else if(aux->duracao > quantum){ //Caso quantum seja maior, Ã© onde ficarÃ¡ a parte mais interessante para o "escalonador"
-            printf("id: %c executando...(%ds)\n",aux->id,aux->duracao); //Mostra qual processo estÃ¡ executando e seu tempo
+        }else if(aux->duracao > quantum){ //Caso quantum seja maior, é onde ficará a parte mais interessante para o "escalonador"
+            printf("id: %c executando...(%ds)\n",aux->id,aux->duracao); //Mostra qual processo está executando e seu tempo
             //Sleep((quantum)*1000); //Simula o time-slice -> Executa o a parcela de tempo equivalente ao quantum
             Processos *prox = aux->prox;
             int i = 0;
@@ -239,7 +228,7 @@ void round_robin(Processos* proc, int quantum, int qtd){
 			}
             aux->duracao = aux->duracao - quantum; //Diminuimos do tempo do processo o seu tempo executado
         }
-        else{ //Tentativa de sair, como Ã© uma lista circular a funÃ§Ã£o fica em loop.
+        else{ //Tentativa de sair, como é uma lista circular a função fica em loop.
         	Processos *prox = aux->prox;
         	int i = 1;
         	while(aux->id != prox->id){
@@ -253,31 +242,22 @@ void round_robin(Processos* proc, int quantum, int qtd){
 				stop++;		
 			}
         }
-        aux = aux->prox; //AvanÃ§a para o prÃ³ximo processo
+        aux = aux->prox; //Avança para o próximo processo
     }
     proc_libera_circular(aux); //Libera a memoria com a lista de processos ordenados por tempo
-    printf("\nFIM RR\n\nTempo mï¿½dio: %0.2f u.t\n", (float) soma/5);
+    printf("\nFIM RR\n\nTempo m?dio: %0.2f u.t\n", (float) soma/5);
 }
 
 /*Programa Principal*/
 int main(int arg, char* argv[]){
     setlocale(LC_ALL, "Portuguese");
 
-    /*InicializaÃ§Ã£o de variÃ¡veis*/
+    /*Inicialização de variáveis*/
     Processos* proc;
     char id;
-    int num, op, quantum, ordem, duracao, i, qtd;
-
+    int num, op, quantum, ordem, duracao, i;
 
     proc = proc_cria(); //Cria uma lista de processos vazia
-    /*printf("Insira quantos processos estÃ£o na fila: \n");
-    scanf("%d",&qtd);
-
-    for (int k = 1; k <= qtd; k++) {
-        printf("Insira a identificaÃ§Ã£o do processo: ");
-        scanf("%d",&);
-    }*/
-
 
     proc = proc_insere(proc,'A',15,1);
     proc = proc_insere(proc,'B',3,2);
@@ -286,11 +266,11 @@ int main(int arg, char* argv[]){
     proc = proc_insere(proc,'E',13,5);
 
     /*printf("Quantos processos estao na fila: ");
-    scanf("%d",&num);printf("\n"); //quantos processos estÃ£o na fila(lista no nosso caso ;))
+    scanf("%d",&num);printf("\n"); //quantos processos estão na fila(lista no nosso caso ;))
 
-    for(i = 1; i <= num; i++){ //LaÃ§o para ler os valores
-        printf("Digite um identificador para o %dÂº processo(char): ", i);
-        scanf(" %c",&id);//ERROR no codeblocks -> nÃ£o executa o scanf
+    for(i = 1; i <= num; i++){ //Laço para ler os valores
+        printf("Digite um identificador para o %dº processo(char): ", i);
+        scanf(" %c",&id);//ERROR no codeblocks -> não executa o scanf
         printf("Digite a ordem de chegada do processo(int): ");
         scanf("%d",&ordem);
         printf("Digite o tempo de execucao do processo(int): ");
@@ -300,7 +280,7 @@ int main(int arg, char* argv[]){
         printf("\n");
     }*/
 
-    /*Menu para ultilizaÃ§Ã£o*/
+    /*Menu para ultilização*/
     printf("[1] - FIFO\n");
     printf("[2] - SFJ\n");
     printf("[3] - RR\n");
@@ -308,18 +288,19 @@ int main(int arg, char* argv[]){
 
     if(op == 1){
     	proc_imprime(proc);
-    	proc_fifo(proc, proc_count(proc));
+    	proc_fifo(proc,5);
 	}else if(op == 2){
         proc_imprime(proc);
         sfj(proc);
     }else if(op == 3){
         printf("\nquantum: "); scanf("%d",&quantum);
-        round_robin(proc, quantum, proc_count(proc));
+        round_robin(proc, quantum,5);
     }else{
-        printf("OpÃ§Ã£o invÃ¡lida"); exit(1);
+        printf("Opção inválida"); exit(1);
     }
     proc_libera(proc);
 
     printf("\n");
     return 0;
 }
+

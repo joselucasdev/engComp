@@ -11,23 +11,44 @@ demorem um pouco mais.
 − Faça o mesmo programa com 100 threads filhos.
 */
 
-//Bibliotecas necessárias
+//Bibliotecas necess�rias
 #include <stdio.h>
-#include <sys/wait.h>
+#include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <windows.h>
+
+#define TAMANHO 100
+
+void * functionAloDoFilho (void *arg) {
+    int *valor = (int *)(arg);
+    printf("Alo do Filho %d\n", *valor);
+    //wait(0);
+    //sleep(1);
+    printf("Tchau do Filho %d\n", *valor);
+    pthread_exit(NULL);		
+}
 
 int main(int argc, char *argv[]){
     pid_t pid;
-
-    pid = fork(); //Cria processo filho
-    if(pid != 0){ //Verifica se é o processo pai
-        printf("Alô do pai %d\n", getpid());
-        wait(0);
+    pthread_t threads [TAMANHO];
+    int i,status;
+    
+    if(pid != 0){ //Verifica se � o processo pai
+        printf("Alo do pai %d\n", getpid());
+        //wait(0);
+        sleep(1);
+        for (i = 0; i < TAMANHO; i++)
+        {
+            status = pthread_create(&threads[i], NULL, functionAloDoFilho, (void *) &i);
+            if(status != 0){
+                printf("Erro ao criar a thread. %d\n", status);
+                return -1;
+            }
+        }
+        //wait(0);
+        sleep(1);
         printf("Tchau do pai!\n");
-    }else{ //Código do processo filho
-        printf("Alô do filho %d\n", getpid());
-
-        printf("Tchau do filho!\n"); //Para sinalizar fim código do filho
     }
 
     return 0;
